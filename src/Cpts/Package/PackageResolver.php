@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Cpts\Package;
 
+use Cpts\Api\Exception\RateLimitException;
 use Cpts\Api\GitHub\GitHubClientInterface;
 use Cpts\Api\Packagist\PackagistClientInterface;
 use Cpts\Exception\PackageNotFoundException;
@@ -64,6 +65,8 @@ class PackageResolver
         if ($gitHubInfo !== null) {
             try {
                 $repository = $this->gitHub->getRepository($gitHubInfo['owner'], $gitHubInfo['repo']);
+            } catch (RateLimitException $e) {
+                throw $e; // Bubble up rate limit errors
             } catch (\Exception) {
                 // GitHub data optional
             }
@@ -105,6 +108,8 @@ class PackageResolver
             $since = new \DateTimeImmutable('-180 days');
             $commits = $this->gitHub->getCommits($owner, $repo, $since);
             $package->setCommits($commits);
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Continue without commit data
         }
@@ -114,6 +119,8 @@ class PackageResolver
             $since = new \DateTimeImmutable('-365 days');
             $issues = $this->gitHub->getIssues($owner, $repo, 'all', $since);
             $package->setIssues($issues);
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Continue without issue data
         }
@@ -122,6 +129,8 @@ class PackageResolver
         try {
             $pullRequests = $this->gitHub->getPullRequests($owner, $repo, 'all');
             $package->setPullRequests($pullRequests);
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Continue without PR data
         }
@@ -130,6 +139,8 @@ class PackageResolver
         try {
             $firstCommitDate = $this->gitHub->getFirstCommitDate($owner, $repo);
             $package->setFirstCommitDate($firstCommitDate);
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Use repo creation date as fallback
         }
@@ -170,6 +181,8 @@ class PackageResolver
                     $detected[] = '.github/copilot-instructions.md';
                 }
             }
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Continue without AI artifact detection
         }
@@ -189,6 +202,8 @@ class PackageResolver
 
                     return;
                 }
+            } catch (RateLimitException $e) {
+                throw $e;
             } catch (\Exception) {
                 continue;
             }
@@ -223,6 +238,8 @@ class PackageResolver
             $package->setLinesOfCode(1000); // Placeholder
             $package->setTodoCount(0); // Would need file content search
             $package->setStubCount(0); // Would need file content search
+        } catch (RateLimitException $e) {
+            throw $e;
         } catch (\Exception) {
             // Use defaults
         }

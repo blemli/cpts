@@ -95,16 +95,6 @@ class PackageEventSubscriber
             $result = new ValidationResult($packageName, $status, $scoreResult);
             $this->validationResults[] = $result;
 
-            // In strict mode, fail on low scores
-            if ($status === ValidationResult::STATUS_FAIL && $this->config->isStrictMode()) {
-                throw new \RuntimeException(sprintf(
-                    'Package %s has CPTS score %.1f, which is below the minimum of %d',
-                    $packageName,
-                    $scoreResult->getScore(),
-                    $this->config->getMinCpts()
-                ));
-            }
-
             // Display inline result
             if ($status === ValidationResult::STATUS_PASS) {
                 $this->io->write(sprintf(

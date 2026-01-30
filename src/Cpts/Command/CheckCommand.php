@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cpts\Command;
 
 use Composer\Command\BaseCommand;
+use Cpts\Api\Exception\RateLimitException;
 use Cpts\Cache\FilesystemCache;
 use Cpts\Config\ComposerConfig;
 use Cpts\Api\GitHub\GitHubClient;
@@ -66,6 +67,13 @@ class CheckCommand extends BaseCommand
 
         // Get packages from lock file
         $packages = $this->getPackages($composer, $input->getOption('dev'));
+
+        // Warn if unauthenticated with many packages
+        if (!$gitHub->isAuthenticated() && count($packages) > 30) {
+            $io->write('<warning>Warning: No GITHUB_TOKEN set. Rate limit is 60 requests/hour.</warning>');
+            $io->write('<comment>Set GITHUB_TOKEN in .env for higher limits (5000/hour).</comment>');
+            $io->write('');
+        }
         $threshold = $input->getOption('fail-under') ?? $config->getMinCpts();
         $onlyPackage = $input->getOption('only');
 
@@ -74,6 +82,7 @@ class CheckCommand extends BaseCommand
         $passCount = 0;
         $trustCount = 0;
         $errorCount = 0;
+        $rateLimitHit = false;
 
         foreach ($packages as $packageData) {
             $packageName = $packageData['name'];
@@ -117,6 +126,17 @@ class CheckCommand extends BaseCommand
                     $failCount++;
                     $io->overwrite("  <info>{$packageName}</info>: <fg=red>{$scoreResult->getScore()}</> ({$scoreResult->getGrade()}) <error>FAIL</error>");
                 }
+            } catch (RateLimitException $e) {
+                $rateLimitHit = true;
+                $results[] = [
+                    'package' => $packageName,
+                    'score' => null,
+                    'status' => 'RATE_LIMITED',
+                    'grade' => '-',
+                    'error' => $e->getMessage(),
+                ];
+                $errorCount++;
+                $io->overwrite("  <info>{$packageName}</info>: <fg=yellow>RATE LIMITED</>");
             } catch (\Exception $e) {
                 $results[] = [
                     'package' => $packageName,
@@ -141,6 +161,16 @@ class CheckCommand extends BaseCommand
             $errorCount
         ));
 
+        // Show rate limit status
+        $remaining = $gitHub->getRemainingRateLimit();
+        if ($rateLimitHit || $remaining < 10) {
+            $io->write('');
+            $io->write('<error>GitHub API rate limit exhausted!</error>');
+            $io->write('<comment>Scores may be inaccurate. Set GITHUB_TOKEN in .env for 5000 requests/hour.</comment>');
+        } elseif (!$gitHub->isAuthenticated()) {
+            $io->write(sprintf('<comment>GitHub API: %d requests remaining (set GITHUB_TOKEN for higher limits)</comment>', $remaining));
+        }
+
         if ($input->getOption('format') === 'json') {
             $io->write('');
             $io->write(json_encode([
@@ -160,7 +190,10 @@ class CheckCommand extends BaseCommand
             ], JSON_PRETTY_PRINT));
         }
 
-        return $failCount > 0 ? 1 : 0;
+        // Only fail if --fail-under was explicitly set
+        $failUnderExplicit = $input->getOption('fail-under') !== null;
+
+        return ($failUnderExplicit && $failCount > 0) ? 1 : 0;
     }
 
     /**

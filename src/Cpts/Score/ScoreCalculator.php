@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Cpts\Score;
 
+use Cpts\Api\Exception\RateLimitException;
 use Cpts\Metric\MetricRegistry;
 use Cpts\Package\PackageInfo;
 
@@ -36,6 +37,8 @@ class ScoreCalculator
                 $result = $metric->calculate($package);
                 $metricResults[$metric->getName()] = $result;
                 $weightedSum += $result->getWeightedScore();
+            } catch (RateLimitException $e) {
+                throw $e; // Bubble up rate limit errors
             } catch (\Exception $e) {
                 // Log and continue with degraded scoring
                 $metricResults[$metric->getName()] = MetricResult::failed(

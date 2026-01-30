@@ -85,7 +85,7 @@ class ComposerConfig implements ConfigInterface
 
     public function isStrictMode(): bool
     {
-        return (bool) ($this->config['strict'] ?? true);
+        return false; // Always warn-only, never block
     }
 
     public function getCacheDir(): string

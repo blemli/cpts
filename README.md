@@ -38,7 +38,8 @@ composer require --dev blemli/cpts
 ```
 
 ```bash
-composer cpts:check                    # Check all dependencies
+composer cpts:check                    # Check all dependencies (advisory)
+composer cpts:check --fail-under=30    # Fail in CI if any score < 30
 composer cpts:score monolog/monolog    # Score single package
 CPTS_DISABLE=1 composer install        # Bypass checks
 ```
@@ -47,15 +48,19 @@ CPTS_DISABLE=1 composer install        # Bypass checks
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `min_cpts` | 20 | Minimum score threshold |
+| `min_cpts` | 20 | Minimum score threshold (warns below) |
 | `trusted_packages` | [] | Patterns to skip (supports wildcards) |
-| `strict` | true | Fail install on low scores |
 
 ### GitHub Token
 
-For higher API rate limits, set `GITHUB_TOKEN` in `.env` or environment:
+**Required for projects with 30+ dependencies.** Without a token, GitHub rate limits to 60 requests/hour (vs 5000 with token).
 
 ```bash
-# .env
+# .env (recommended)
 GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+# or export
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 ```
+
+Create a token at https://github.com/settings/tokens (no scopes needed for public repos).
