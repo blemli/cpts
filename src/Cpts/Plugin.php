@@ -61,9 +61,37 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $json->write($config);
 
             $io->write('<info>CPTS:</info> Added default config to composer.json');
+
+            // Offer to add cache dir to .gitignore
+            $this->offerGitignore($io);
         } catch (\Exception) {
             // Silently fail - config is optional
         }
+    }
+
+    private function offerGitignore(IOInterface $io): void
+    {
+        $gitignorePath = dirname(Factory::getComposerFile()) . '/.gitignore';
+        $cacheEntry = '.cpts-cache/';
+
+        // Check if .gitignore exists and already has the entry
+        if (file_exists($gitignorePath)) {
+            $content = file_get_contents($gitignorePath);
+            if ($content !== false && str_contains($content, $cacheEntry)) {
+                return; // Already ignored
+            }
+        }
+
+        // Ask user
+        if (!$io->askConfirmation('<info>CPTS:</info> Add .cpts-cache/ to .gitignore? [Y/n] ', true)) {
+            return;
+        }
+
+        // Add to .gitignore
+        $newLine = file_exists($gitignorePath) && !str_ends_with((string) file_get_contents($gitignorePath), "\n") ? "\n" : '';
+        file_put_contents($gitignorePath, $newLine . $cacheEntry . "\n", FILE_APPEND);
+
+        $io->write('<info>CPTS:</info> Added .cpts-cache/ to .gitignore');
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
