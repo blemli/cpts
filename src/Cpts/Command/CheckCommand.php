@@ -158,27 +158,27 @@ class CheckCommand extends BaseCommand
         $io->write('');
 
         // Table header
-        $emojiHeader = implode('', array_values($metricEmojis));
-        $io->write(sprintf('%-45s %7s %s', 'Package', 'Score', $emojiHeader));
-        $io->write(str_repeat('-', 80));
+        $emojiHeader = implode(' ', array_values($metricEmojis));
+        $io->write(sprintf('%-45s   %7s  %s', 'Package', 'Score', $emojiHeader));
+        $io->write(str_repeat('-', 95));
 
         // Table rows
         foreach ($results as $r) {
             if ($r['status'] === 'TRUSTED') {
-                $io->write(sprintf('%-45s %7s <fg=cyan>TRUSTED</>', $r['package'], '-'));
+                $io->write(sprintf('%-45s   %7s  <fg=cyan>TRUSTED</>', $r['package'], '-'));
             } elseif ($r['status'] === 'ERROR' || $r['status'] === 'RATE_LIMITED') {
-                $io->write(sprintf('%-45s %7s <fg=yellow>%s</>', $r['package'], '-', $r['status']));
+                $io->write(sprintf('%-45s   %7s  <fg=yellow>%s</>', $r['package'], '-', $r['status']));
             } else {
                 /** @var \Cpts\Score\ScoreResult $scoreResult */
                 $scoreResult = $r['result'];
                 $metricsStr = $scoreResult->getMetricEmojis($metricEmojis);
                 $scoreStr = $scoreResult->getScoreFormatted();
-                $gradeStr = $r['grade'];
+                $gradeEmoji = $scoreResult->getGradeEmoji();
 
                 if ($r['status'] === 'FAIL') {
-                    $io->write(sprintf('%-45s %7s (%s) %s <comment>LOW</comment>', $r['package'], $scoreStr, $gradeStr, $metricsStr));
+                    $io->write(sprintf('%-45s %s %7s  %s <comment>LOW</comment>', $r['package'], $gradeEmoji, $scoreStr, $metricsStr));
                 } else {
-                    $io->write(sprintf('%-45s %7s (%s) %s', $r['package'], $scoreStr, $gradeStr, $metricsStr));
+                    $io->write(sprintf('%-45s %s %7s  %s', $r['package'], $gradeEmoji, $scoreStr, $metricsStr));
                 }
             }
         }

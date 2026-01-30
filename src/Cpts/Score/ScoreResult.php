@@ -105,6 +105,11 @@ class ScoreResult
         return number_format($this->score, 2);
     }
 
+    public function getScoreFormatted(): string
+    {
+        return number_format($this->score, 2);
+    }
+
     /**
      * @return array<string, mixed>
      */
