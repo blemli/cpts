@@ -1,0 +1,50 @@
+{
+    "name": "blemli/cpts",
+    "description": "Composer Package Trust Score - Security and quality scoring for PHP dependencies",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "keywords": ["composer", "security", "trust", "scoring", "dependencies", "audit"],
+    "authors": [
+        {
+            "name": "CPTS Team"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "composer-plugin-api": "^2.0",
+        "guzzlehttp/guzzle": "^7.5",
+        "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "composer/composer": "^2.6",
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.10",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cpts\\": "src/Cpts/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cpts\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "class": "Cpts\\Plugin"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "blemli/cpts": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "phpstan": "phpstan analyse src tests --level=8",
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff"
+    }
+}
