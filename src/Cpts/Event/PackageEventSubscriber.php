@@ -200,7 +200,8 @@ class PackageEventSubscriber
             $httpClient = new Client(['timeout' => 30]);
             $gitHub = new GitHubClient($httpClient, $cache, $this->config->getGitHubToken());
             $packagist = new PackagistClient($httpClient, $cache);
-            $this->resolver = new PackageResolver($gitHub, $packagist);
+            $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+            $this->resolver = new PackageResolver($gitHub, $packagist, $vendorDir);
         }
 
         return $this->resolver;

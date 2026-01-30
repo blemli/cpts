@@ -58,7 +58,8 @@ class CheckCommand extends BaseCommand
         $httpClient = new Client(['timeout' => 30]);
         $gitHub = new GitHubClient($httpClient, $cache, $config->getGitHubToken());
         $packagist = new PackagistClient($httpClient, $cache);
-        $resolver = new PackageResolver($gitHub, $packagist);
+        $vendorDir = $composer->getConfig()->get('vendor-dir');
+        $resolver = new PackageResolver($gitHub, $packagist, $vendorDir);
 
         $metricRegistry = new MetricRegistry($config);
         $trustBonus = new TrustBonus();

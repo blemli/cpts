@@ -37,6 +37,7 @@ class PackageResolver
     public function __construct(
         private readonly GitHubClientInterface $gitHub,
         private readonly PackagistClientInterface $packagist,
+        private readonly ?string $vendorDir = null,
     ) {
     }
 
@@ -58,9 +59,14 @@ class PackageResolver
             // Packagist data optional
         }
 
-        // Determine GitHub repo
+        // Determine GitHub repo from Packagist or local composer.json
         $repository = null;
         $gitHubInfo = $packagistPackage?->getGitHubOwnerAndRepo();
+
+        // Fallback: try local composer.json for non-Packagist packages
+        if ($gitHubInfo === null) {
+            $gitHubInfo = $this->getGitHubInfoFromLocal($packageName);
+        }
 
         if ($gitHubInfo !== null) {
             try {
@@ -99,6 +105,52 @@ class PackageResolver
         }
 
         return [$parts[0], $parts[1]];
+    }
+
+    /**
+     * Try to get GitHub info from local vendor package composer.json
+     *
+     * @return array{owner: string, repo: string}|null
+     */
+    private function getGitHubInfoFromLocal(string $packageName): ?array
+    {
+        if ($this->vendorDir === null) {
+            return null;
+        }
+
+        $composerPath = $this->vendorDir . '/' . $packageName . '/composer.json';
+
+        if (!file_exists($composerPath)) {
+            return null;
+        }
+
+        $content = file_get_contents($composerPath);
+        if ($content === false) {
+            return null;
+        }
+
+        $data = json_decode($content, true);
+        if (!is_array($data)) {
+            return null;
+        }
+
+        // Try various fields that might contain GitHub URL
+        $urls = [
+            $data['support']['source'] ?? null,
+            $data['homepage'] ?? null,
+            $data['source']['url'] ?? null,
+        ];
+
+        foreach ($urls as $url) {
+            if ($url !== null && preg_match('#github\.com[/:]([^/]+)/([^/\.]+)#', $url, $matches)) {
+                return [
+                    'owner' => $matches[1],
+                    'repo' => rtrim($matches[2], '.git'),
+                ];
+            }
+        }
+
+        return null;
     }
 
     private function fetchGitHubData(PackageInfo $package, string $owner, string $repo): void
