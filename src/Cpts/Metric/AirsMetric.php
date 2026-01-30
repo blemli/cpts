@@ -69,7 +69,7 @@ class AirsMetric extends AbstractMetric
 
     public function getName(): string
     {
-        return 'airs';
+        return 'robotic';
     }
 
     public function getDescription(): string

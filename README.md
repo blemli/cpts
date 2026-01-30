@@ -12,7 +12,7 @@ composer require --dev blemli/cpts
 
 | | Metric | Weight | What it measures |
 |--|--------|--------|------------------|
-| 🤖 | AIRS | 3 | AI-workflow risk (lower is better) |
+| 🤖 | Robotic | 3 | AI-workflow risk (lower is better) |
 | 🗓️ | Activity | 4 | Commit recency + frequency |
 | 👨‍💻 | Committers | 5 | Bus factor (unique contributors) |
 | ⭐ | Stars | 1 | GitHub attention signal |
@@ -68,6 +68,27 @@ Default config is added to `composer.json` automatically on install:
 |--------|---------|-------------|
 | `min_cpts` | 20 | Minimum score threshold (warns below) |
 | `trusted_packages` | [] | Patterns to skip (supports wildcards) |
+| `weights` | {} | Custom metric weights (see below) |
+
+### Custom Weights
+
+Override default weights in `extra.cpts.weights`:
+
+```json
+{
+  "extra": {
+    "cpts": {
+      "weights": {
+        "repo_age": 4,
+        "activity": 6,
+        "airs": 0
+      }
+    }
+  }
+}
+```
+
+Metric names: `robotic`, `activity`, `committers`, `stars`, `dependents`, `repo_age`, `hygiene`, `issue_behaviour`, `dependency_count`
 
 ### GitHub Token
 
