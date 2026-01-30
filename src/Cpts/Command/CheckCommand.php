@@ -175,11 +175,7 @@ class CheckCommand extends BaseCommand
                 $scoreStr = $scoreResult->getScoreFormatted();
                 $gradeEmoji = $scoreResult->getGradeEmoji();
 
-                if ($r['status'] === 'FAIL') {
-                    $io->write(sprintf('%-45s %s %7s  %s <comment>LOW</comment>', $r['package'], $gradeEmoji, $scoreStr, $metricsStr));
-                } else {
-                    $io->write(sprintf('%-45s %s %7s  %s', $r['package'], $gradeEmoji, $scoreStr, $metricsStr));
-                }
+                $io->write(sprintf('%-45s %s %7s  %s', $r['package'], $gradeEmoji, $scoreStr, $metricsStr));
             }
         }
 

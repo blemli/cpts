@@ -55,15 +55,17 @@ class MetricResult
         }
 
         return match (true) {
-            $this->normalizedScore >= 0.7 => '🟢',  // green - good
-            $this->normalizedScore >= 0.4 => '🟡',  // yellow - medium
-            default => '🔴',                         // red - low
+            $this->normalizedScore >= 0.8 => '🟢',  // green - excellent
+            $this->normalizedScore >= 0.6 => '🟡',  // yellow - good
+            $this->normalizedScore >= 0.4 => '🟠',  // orange - caution
+            $this->normalizedScore >= 0.2 => '🔴',  // red - warning
+            default => '⚫',                         // black - fail
         };
     }
 
     public function isGood(): bool
     {
-        return !$this->failed && $this->normalizedScore >= 0.7;
+        return !$this->failed && $this->normalizedScore >= 0.8;
     }
 
     /**

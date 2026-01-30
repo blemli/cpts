@@ -66,7 +66,7 @@ class ScoreResult
     public function getGradeEmoji(): string
     {
         return match ($this->getGrade()) {
-            'A' => '⬜',  // white - excellent
+            'A' => '🟢',  // green - excellent
             'B' => '🟡',  // yellow - good
             'C' => '🟠',  // orange - caution
             'D' => '🔴',  // red - warning
