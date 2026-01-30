@@ -4,6 +4,11 @@
     "type": "composer-plugin",
     "license": "MIT",
     "keywords": ["composer", "security", "trust", "scoring", "dependencies", "audit"],
+    "homepage": "https://github.com/blemli/cpts",
+    "support": {
+        "source": "https://github.com/blemli/cpts",
+        "issues": "https://github.com/blemli/cpts/issues"
+    },
     "authors": [
         {
             "name": "CPTS Team"
