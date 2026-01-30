@@ -41,10 +41,26 @@ composer require --dev blemli/cpts
 composer cpts:check                    # Check all dependencies (advisory)
 composer cpts:check --fail-under=30    # Fail in CI if any score < 30
 composer cpts:score monolog/monolog    # Score single package
+composer cpts:trust symfony/*          # Trust all symfony packages
+composer cpts:trust vendor/package     # Trust specific package
+composer cpts:trust symfony/* --remove # Remove from trusted
 CPTS_DISABLE=1 composer install        # Bypass checks
 ```
 
 ## Configuration
+
+Default config is added to `composer.json` automatically on install:
+
+```json
+{
+  "extra": {
+    "cpts": {
+      "min_cpts": 20,
+      "trusted_packages": []
+    }
+  }
+}
+```
 
 | Option | Default | Description |
 |--------|---------|-------------|

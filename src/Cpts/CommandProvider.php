@@ -7,6 +7,7 @@ namespace Cpts;
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Cpts\Command\CheckCommand;
 use Cpts\Command\ScoreCommand;
+use Cpts\Command\TrustCommand;
 
 class CommandProvider implements CommandProviderCapability
 {
@@ -18,6 +19,7 @@ class CommandProvider implements CommandProviderCapability
         return [
             new CheckCommand(),
             new ScoreCommand(),
+            new TrustCommand(),
         ];
     }
 }

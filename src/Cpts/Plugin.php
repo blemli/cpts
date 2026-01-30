@@ -6,7 +6,9 @@ namespace Cpts;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Factory;
 use Composer\IO\IOInterface;
+use Composer\Json\JsonFile;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 use Cpts\Config\ComposerConfig;
@@ -25,6 +27,43 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $this->composer = $composer;
         $this->io = $io;
+
+        $this->ensureConfigExists($io);
+    }
+
+    private function ensureConfigExists(IOInterface $io): void
+    {
+        try {
+            $composerFile = Factory::getComposerFile();
+            $json = new JsonFile($composerFile);
+
+            if (!$json->exists()) {
+                return;
+            }
+
+            $config = $json->read();
+
+            // Check if cpts config already exists
+            if (isset($config['extra']['cpts'])) {
+                return;
+            }
+
+            // Add default config
+            if (!isset($config['extra'])) {
+                $config['extra'] = [];
+            }
+
+            $config['extra']['cpts'] = [
+                'min_cpts' => 20,
+                'trusted_packages' => [],
+            ];
+
+            $json->write($config);
+
+            $io->write('<info>CPTS:</info> Added default config to composer.json');
+        } catch (\Exception) {
+            // Silently fail - config is optional
+        }
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
