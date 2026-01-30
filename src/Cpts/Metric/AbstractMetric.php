@@ -21,6 +21,8 @@ abstract class AbstractMetric implements MetricInterface
 
     abstract public function getDefaultWeight(): float;
 
+    abstract public function getEmoji(): string;
+
     abstract public function calculate(PackageInfo $package): MetricResult;
 
     public function getWeight(): float
@@ -60,6 +62,7 @@ abstract class AbstractMetric implements MetricInterface
             normalizedScore: $this->clamp($normalized),
             rawValue: $rawValue,
             weight: $this->getWeight(),
+            emoji: $this->getEmoji(),
         );
     }
 }

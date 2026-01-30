@@ -96,19 +96,22 @@ class PackageEventSubscriber
             $this->validationResults[] = $result;
 
             // Display inline result
+            $metricsStr = $scoreResult->getMetricEmojis();
             if ($status === ValidationResult::STATUS_PASS) {
                 $this->io->write(sprintf(
-                    '  <info>CPTS</info> %s: <fg=green>%.1f</> (%s)',
-                    $packageName,
-                    $scoreResult->getScore(),
-                    $scoreResult->getGrade()
-                ));
-            } else {
-                $this->io->write(sprintf(
-                    '  <info>CPTS</info> %s: <fg=red>%.1f</> (%s) <comment>below minimum %d</comment>',
+                    '  <info>%s</info>: %.1f (%s) %s',
                     $packageName,
                     $scoreResult->getScore(),
                     $scoreResult->getGrade(),
+                    $metricsStr
+                ));
+            } else {
+                $this->io->write(sprintf(
+                    '  <info>%s</info>: %.1f (%s) %s <comment>below %d</comment>',
+                    $packageName,
+                    $scoreResult->getScore(),
+                    $scoreResult->getGrade(),
+                    $metricsStr,
                     $this->config->getMinCpts()
                 ));
             }

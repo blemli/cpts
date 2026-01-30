@@ -34,6 +34,11 @@ class CommittersMetric extends AbstractMetric
         return 5.0;
     }
 
+    public function getEmoji(): string
+    {
+        return '👨‍💻';
+    }
+
     public function isApplicable(PackageInfo $package): bool
     {
         return $package->hasGitHubData();

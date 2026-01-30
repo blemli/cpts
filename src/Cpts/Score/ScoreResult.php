@@ -63,6 +63,38 @@ class ScoreResult
         };
     }
 
+    public function getGradeEmoji(): string
+    {
+        return match ($this->getGrade()) {
+            'A' => '⬜',  // white - excellent
+            'B' => '🟡',  // yellow - good
+            'C' => '🟠',  // orange - caution
+            'D' => '🔴',  // red - warning
+            'F' => '⚫',  // black - fail
+            default => '❓',
+        };
+    }
+
+    public function getGradeWithEmoji(): string
+    {
+        return $this->getGradeEmoji() . ' ' . $this->getGrade();
+    }
+
+    /**
+     * Get metric breakdown as emoji string, only showing yellow/red metrics.
+     */
+    public function getMetricEmojis(): string
+    {
+        $parts = [];
+        foreach ($this->metricResults as $result) {
+            if (!$result->isGood()) {
+                $parts[] = $result->getEmojiWithColor();
+            }
+        }
+
+        return implode(' ', $parts);
+    }
+
     /**
      * @return array<string, mixed>
      */

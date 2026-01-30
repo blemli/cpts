@@ -41,6 +41,11 @@ class IssueBehaviourMetric extends AbstractMetric
         return 4.0;
     }
 
+    public function getEmoji(): string
+    {
+        return '🎫';
+    }
+
     public function isApplicable(PackageInfo $package): bool
     {
         return $package->hasGitHubData();

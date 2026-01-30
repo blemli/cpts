@@ -34,6 +34,11 @@ class DependencyCountMetric extends AbstractMetric
         return 3.0;
     }
 
+    public function getEmoji(): string
+    {
+        return '🔗';
+    }
+
     public function isHigherBetter(): bool
     {
         return false; // More dependencies = worse

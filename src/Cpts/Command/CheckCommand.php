@@ -119,12 +119,13 @@ class CheckCommand extends BaseCommand
                     'result' => $scoreResult,
                 ];
 
+                $metricsStr = $scoreResult->getMetricEmojis();
                 if ($status === 'PASS') {
                     $passCount++;
-                    $io->overwrite("  <info>{$packageName}</info>: <fg=green>{$scoreResult->getScore()}</> ({$scoreResult->getGrade()})");
+                    $io->overwrite("  <info>{$packageName}</info>: {$scoreResult->getScore()} ({$scoreResult->getGrade()}) {$metricsStr}");
                 } else {
                     $failCount++;
-                    $io->overwrite("  <info>{$packageName}</info>: <fg=red>{$scoreResult->getScore()}</> ({$scoreResult->getGrade()}) <error>FAIL</error>");
+                    $io->overwrite("  <info>{$packageName}</info>: {$scoreResult->getScore()} ({$scoreResult->getGrade()}) {$metricsStr} <comment>LOW</comment>");
                 }
             } catch (RateLimitException $e) {
                 $rateLimitHit = true;

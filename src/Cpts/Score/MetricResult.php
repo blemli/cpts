@@ -14,6 +14,7 @@ class MetricResult
         public readonly float $normalizedScore,
         public readonly array $rawValue,
         public readonly float $weight,
+        public readonly string $emoji = '❓',
         public readonly bool $failed = false,
         public readonly ?string $error = null,
     ) {
@@ -26,9 +27,15 @@ class MetricResult
             normalizedScore: 0.0,
             rawValue: [],
             weight: 0.0,
+            emoji: '❓',
             failed: true,
             error: $error,
         );
+    }
+
+    public function getEmojiWithColor(): string
+    {
+        return $this->emoji . $this->getColorDot();
     }
 
     public function getNormalizedScore(): float
@@ -39,6 +46,24 @@ class MetricResult
     public function getWeightedScore(): float
     {
         return $this->normalizedScore * $this->weight;
+    }
+
+    public function getColorDot(): string
+    {
+        if ($this->failed) {
+            return '⚫';
+        }
+
+        return match (true) {
+            $this->normalizedScore >= 0.7 => '🟢',  // green - good
+            $this->normalizedScore >= 0.4 => '🟡',  // yellow - medium
+            default => '🔴',                         // red - low
+        };
+    }
+
+    public function isGood(): bool
+    {
+        return !$this->failed && $this->normalizedScore >= 0.7;
     }
 
     /**

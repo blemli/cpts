@@ -41,4 +41,9 @@ interface MetricInterface
      * Default true; set false for metrics like "dependency count".
      */
     public function isHigherBetter(): bool;
+
+    /**
+     * Emoji icon for this metric.
+     */
+    public function getEmoji(): string;
 }

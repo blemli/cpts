@@ -46,5 +46,10 @@
         "phpstan": "phpstan analyse src tests --level=8",
         "cs-fix": "php-cs-fixer fix",
         "cs-check": "php-cs-fixer fix --dry-run --diff"
-    }
+    },
+    "repositories": [{
+        "name": "cpts",
+        "type": "vcs",
+        "url": "https://github.com/blemli/cpts"
+    }]
 }

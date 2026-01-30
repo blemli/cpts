@@ -42,6 +42,11 @@ class HygieneMetric extends AbstractMetric
         return 1.0;
     }
 
+    public function getEmoji(): string
+    {
+        return '🧹';
+    }
+
     public function isApplicable(PackageInfo $package): bool
     {
         return $package->hasGitHubData();

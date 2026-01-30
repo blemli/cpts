@@ -10,17 +10,19 @@ composer require --dev blemli/cpts
 
 ## Metrics
 
-| Metric | Weight | What it measures |
-|--------|--------|------------------|
-| AIRS | 3 | AI-workflow risk (lower is better) |
-| Activity | 4 | Commit recency + frequency |
-| Committers | 5 | Bus factor (unique contributors) |
-| Stars | 1 | GitHub attention signal |
-| Dependents | 2 | Production adoption |
-| Repo Age | 2 | Maturity |
-| Hygiene | 1 | Tests, TODOs, stubs |
-| Issues | 4 | Responsiveness to issues/PRs |
-| Dependencies | 3 | Direct dep count (fewer = better) |
+| | Metric | Weight | What it measures |
+|--|--------|--------|------------------|
+| 🤖 | AIRS | 3 | AI-workflow risk (lower is better) |
+| 🗓️ | Activity | 4 | Commit recency + frequency |
+| 👨‍💻 | Committers | 5 | Bus factor (unique contributors) |
+| ⭐ | Stars | 1 | GitHub attention signal |
+| 📦 | Dependents | 2 | Production adoption |
+| 🕰️ | Repo Age | 2 | Maturity |
+| 🧹 | Hygiene | 1 | Tests, TODOs, stubs |
+| 🎫 | Issues | 4 | Responsiveness to issues/PRs |
+| 🔗 | Dependencies | 3 | Direct dep count (fewer = better) |
+
+Only 🟡 (medium) and 🔴 (low) metrics are shown in output.
 
 **Trust Bonus** (±10 points): verified org, signed commits, maintainer reputation, bus factor penalties.
 
