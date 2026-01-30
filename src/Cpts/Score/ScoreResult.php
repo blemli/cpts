@@ -81,18 +81,28 @@ class ScoreResult
     }
 
     /**
-     * Get metric breakdown as emoji string, only showing yellow/red metrics.
+     * Get metric breakdown as emoji string showing all metrics.
+     *
+     * @param array<string, string> $allMetricEmojis Ordered map of metric name => emoji
      */
-    public function getMetricEmojis(): string
+    public function getMetricEmojis(array $allMetricEmojis = []): string
     {
         $parts = [];
-        foreach ($this->metricResults as $result) {
-            if (!$result->isGood()) {
-                $parts[] = $result->getEmojiWithColor();
+
+        foreach ($allMetricEmojis as $name => $emoji) {
+            if (isset($this->metricResults[$name])) {
+                $parts[] = $this->metricResults[$name]->getEmojiWithColor();
+            } else {
+                $parts[] = $emoji . '⚫'; // Not calculated
             }
         }
 
-        return implode(' ', $parts);
+        return implode('', $parts);
+    }
+
+    public function getScoreFormatted(): string
+    {
+        return number_format($this->score, 2);
     }
 
     /**

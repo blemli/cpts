@@ -65,6 +65,12 @@ class CheckCommand extends BaseCommand
         $calculator = new ScoreCalculator($metricRegistry, $trustBonus);
         $matcher = new TrustedPackageMatcher($config->getTrustedPackages());
 
+        // Build metric emoji map (ordered)
+        $metricEmojis = [];
+        foreach ($metricRegistry->getMetrics() as $metric) {
+            $metricEmojis[$metric->getName()] = $metric->getEmoji();
+        }
+
         // Get packages from lock file
         $packages = $this->getPackages($composer, $input->getOption('dev'));
 
@@ -105,7 +111,7 @@ class CheckCommand extends BaseCommand
             }
 
             try {
-                $io->write("  Checking <info>{$packageName}</info>...", false);
+                $io->write('.', false);
                 $packageInfo = $resolver->resolve($packageName);
                 $scoreResult = $calculator->calculate($packageInfo);
 
@@ -119,13 +125,10 @@ class CheckCommand extends BaseCommand
                     'result' => $scoreResult,
                 ];
 
-                $metricsStr = $scoreResult->getMetricEmojis();
                 if ($status === 'PASS') {
                     $passCount++;
-                    $io->overwrite("  <info>{$packageName}</info>: {$scoreResult->getScore()} ({$scoreResult->getGrade()}) {$metricsStr}");
                 } else {
                     $failCount++;
-                    $io->overwrite("  <info>{$packageName}</info>: {$scoreResult->getScore()} ({$scoreResult->getGrade()}) {$metricsStr} <comment>LOW</comment>");
                 }
             } catch (RateLimitException $e) {
                 $rateLimitHit = true;
@@ -137,7 +140,7 @@ class CheckCommand extends BaseCommand
                     'error' => $e->getMessage(),
                 ];
                 $errorCount++;
-                $io->overwrite("  <info>{$packageName}</info>: <fg=yellow>RATE LIMITED</>");
+                $io->write('!', false);
             } catch (\Exception $e) {
                 $results[] = [
                     'package' => $packageName,
@@ -147,12 +150,40 @@ class CheckCommand extends BaseCommand
                     'error' => $e->getMessage(),
                 ];
                 $errorCount++;
-                $io->overwrite("  <info>{$packageName}</info>: <fg=yellow>ERROR</> - " . $e->getMessage());
+                $io->write('x', false);
             }
         }
 
         $io->write('');
-        $io->write('---');
+        $io->write('');
+
+        // Table header
+        $emojiHeader = implode('', array_values($metricEmojis));
+        $io->write(sprintf('%-45s %7s %s', 'Package', 'Score', $emojiHeader));
+        $io->write(str_repeat('-', 80));
+
+        // Table rows
+        foreach ($results as $r) {
+            if ($r['status'] === 'TRUSTED') {
+                $io->write(sprintf('%-45s %7s <fg=cyan>TRUSTED</>', $r['package'], '-'));
+            } elseif ($r['status'] === 'ERROR' || $r['status'] === 'RATE_LIMITED') {
+                $io->write(sprintf('%-45s %7s <fg=yellow>%s</>', $r['package'], '-', $r['status']));
+            } else {
+                /** @var \Cpts\Score\ScoreResult $scoreResult */
+                $scoreResult = $r['result'];
+                $metricsStr = $scoreResult->getMetricEmojis($metricEmojis);
+                $scoreStr = $scoreResult->getScoreFormatted();
+                $gradeStr = $r['grade'];
+
+                if ($r['status'] === 'FAIL') {
+                    $io->write(sprintf('%-45s %7s (%s) %s <comment>LOW</comment>', $r['package'], $scoreStr, $gradeStr, $metricsStr));
+                } else {
+                    $io->write(sprintf('%-45s %7s (%s) %s', $r['package'], $scoreStr, $gradeStr, $metricsStr));
+                }
+            }
+        }
+
+        $io->write(str_repeat('-', 80));
         $io->write(sprintf(
             'Checked %d packages: <fg=green>%d passed</>, <fg=red>%d failed</>, <fg=cyan>%d trusted</>, <fg=yellow>%d errors</>',
             count($results),

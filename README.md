@@ -22,7 +22,7 @@ composer require --dev blemli/cpts
 | 🎫 | Issues | 4 | Responsiveness to issues/PRs |
 | 🔗 | Dependencies | 3 | Direct dep count (fewer = better) |
 
-Only 🟡 (medium) and 🔴 (low) metrics are shown in output.
+Colors: 🟢 good (≥70%) · 🟡 medium (40-70%) · 🔴 low (<40%) · ⚫ not calculated
 
 **Trust Bonus** (±10 points): verified org, signed commits, maintainer reputation, bus factor penalties.
 
