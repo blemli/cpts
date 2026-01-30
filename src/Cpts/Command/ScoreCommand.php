@@ -80,6 +80,14 @@ class ScoreCommand extends BaseCommand
 
             // Calculate score
             $packageInfo = $resolver->resolve($packageName);
+
+            // Debug: show data availability
+            if ($format !== 'minimal') {
+                $io->write(sprintf('<comment>Packagist data: %s</comment>', $packageInfo->hasPackagistData() ? 'yes' : 'no'));
+                $io->write(sprintf('<comment>GitHub data: %s</comment>', $packageInfo->hasGitHubData() ? 'yes' : 'no'));
+                $io->write('');
+            }
+
             $result = $calculator->calculate($packageInfo);
 
             // Output based on format

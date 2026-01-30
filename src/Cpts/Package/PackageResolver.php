@@ -73,9 +73,12 @@ class PackageResolver
                 $repository = $this->gitHub->getRepository($gitHubInfo['owner'], $gitHubInfo['repo']);
             } catch (RateLimitException $e) {
                 throw $e; // Bubble up rate limit errors
-            } catch (\Exception) {
-                // GitHub data optional
+            } catch (\Exception $e) {
+                // Log the error for debugging
+                error_log("CPTS: GitHub fetch failed for {$gitHubInfo['owner']}/{$gitHubInfo['repo']}: " . $e->getMessage());
             }
+        } else {
+            error_log("CPTS: No GitHub info found for {$packageName}");
         }
 
         $packageInfo = new PackageInfo(
