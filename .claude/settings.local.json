@@ -4,7 +4,12 @@
       "WebSearch",
       "WebFetch(domain:getcomposer.org)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:packagist.org)"
+      "WebFetch(domain:packagist.org)",
+      "Bash(curl:*)",
+      "Bash(git fetch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ]
   }
 }

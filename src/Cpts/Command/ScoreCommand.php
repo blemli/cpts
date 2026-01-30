@@ -58,9 +58,21 @@ class ScoreCommand extends BaseCommand
                 : new FilesystemCache($config->getCacheDir());
 
             $httpClient = new Client(['timeout' => 30]);
-            $gitHub = new GitHubClient($httpClient, $cache, $config->getGitHubToken());
+            $token = $config->getGitHubToken();
+            $gitHub = new GitHubClient($httpClient, $cache, $token);
             $packagist = new PackagistClient($httpClient, $cache);
-            $resolver = new PackageResolver($gitHub, $packagist);
+            $vendorDir = $composer->getConfig()->get('vendor-dir');
+            $resolver = new PackageResolver($gitHub, $packagist, $vendorDir);
+
+            // Debug token status
+            if ($format !== 'minimal') {
+                if ($token) {
+                    $io->write(sprintf('<comment>GitHub: authenticated (%d requests remaining)</comment>', $gitHub->getRemainingRateLimit()));
+                } else {
+                    $io->write('<warning>GitHub: no token (rate limit 60/hr)</warning>');
+                }
+                $io->write('');
+            }
 
             $metricRegistry = new MetricRegistry($config);
             $trustBonus = new TrustBonus();
